@@ -46,6 +46,17 @@ class TupleCombination:
         self._tuple_combination = value
 
 
+    @property
+    def used_numbers(self):
+        return self._used_numbers
+
+    @used_number.setter
+    def used_numbers(self):
+        if not isinstance(value, int):
+            raise ValueError("Must be integer")
+        self._used_numbers = value
+
+
 
 user_list = [9, 10, 9, 1, 50, 25]
 
