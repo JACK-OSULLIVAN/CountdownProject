@@ -1,86 +1,77 @@
+from letter_game_classses import CreateGameDict, ScoreGenerator
 import random
-import itertools
+import time
 
-# Letter Game
 # Create a list of the alphabet
-alphabet = "abcdefghijklmnopqrstuvwxyz"
-alphabet_list = [*alphabet]  #Learnt this on stackoverflow, gamechanger!
+# alphabet = "abcdefghijklmnopqrstuvwxyz"
+# alphabet_list = [*alphabet]
+ALPHABET_LIST = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 
-# Create a separate vowel list and consonant list
-vowel = "aeiou"
-vowel_list = [letter for letter in alphabet_list if letter in vowel]
-consonant_list = [letter for letter in alphabet_list if letter not in vowel]
-
-# Let the User Choose 9 letters, being either consonants or vowels
-COUNT = 0
-
-def user_choice():
-    global COUNT
-    while COUNT <= 8:
-        user_choice = input("consonant(c) or vowel(v)? ")
-        if user_choice == "c":
-            chosen_consonant = random.choice(consonant_list)  # choice method is used assuming infinite number of each letter
-            user_list.append(chosen_consonant)
-            COUNT += 1
-            print(f"Your current letters are: {user_list}\n"
-                  f"{9 - COUNT} letters remaining.")
-        elif user_choice == "v":
-            chosen_vowel = random.choice(vowel_list)
-            user_list.append(chosen_vowel)
-            COUNT += 1
-            print(f"Your current letters are: {user_list}\n"
-                  f"{9 - COUNT} letters remaining.")
-        else:
-            "Incorrect input, please enter again"
+# # Create a separate vowel list and consonant list
+# vowel = "aeiou"
+# vowel_list = [letter for letter in ALPHABET_LIST if letter in vowel]
+# consonant_list = [letter for letter in ALPHABET_LIST if letter not in vowel]
+VOWEL_LIST = ['a', 'e', 'i', 'o', 'u']
+CONSONANT_LIST = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z']
 
 
-user_list = []
-user_choice()
+# TODO: Let the User Choose 9 letters, being either consonants or vowels
+"""Currently commented out as I'm running randomly generated lists of different vowel-consonant ratios"""
 
-# From user_list generate all possible permutations. Sort into a Dictionary where Key = length of the word
-# and value is a list of all permutations with that length.
-""" Note: I've done it this way to hopefully reduce time taken, 
-will need to import time module to check (delete when tested)"""
-
-user_dict = {}
-for i in range(1, len(user_list) + 1):
-    possible_combs = list(itertools.permutations(user_list, i))  # For words, order of letters is important, therefore permutations instead of combinations
-    possible_word_permutations = [''.join(tups) for tups in possible_combs]
-    if i in user_dict:
-        user_dict[i].extend(possible_word_permutations)
-    else:
-        user_dict[i] = possible_word_permutations
-
-# Open and read the text file (downloaded from https://www.wordgamedictionary.com/enable/)
-# that contains the ENABLE Dictionary.
-with open("./words.txt") as file:
-    data = file.read()
-
-# Get all the words into a list
-word_list = data.split()
-
-# Sort the word list into a dictionary key=word_length: value=list of words with word length
-word_dict = {}
-for word in word_list:
-    word_length = len(word)  # Note can start at words with length 10 later as larger words not needed
-    if word_length in word_dict:
-        word_dict[word_length].append(word)
-    else:
-        word_dict[word_length] = [word]
-
-# Starting from maximum length of word, cross-reference permutations with words from word_dict
-"""Currently set to print word length and every word available whilst testing.
-Once satisfied will change it to stop at first key match"""
-
-for i in range(len(user_list), 1, -1):
-    try:
-        print(i, set(user_dict[i]).intersection(word_dict[i]))
-    except KeyError:  #
-        print(f"there are no words present with length {i}")
+#
+# def user_choice():
+#     count = 0
+#     while count <= 8:
+#         user_choice = input("consonant(c) or vowel(v)? ")
+#         if user_choice == "c":
+#             chosen_consonant = random.choice(CONSONANT_LIST)  # choice method is used assuming infinite number of each letter
+#             user_list.append(chosen_consonant)
+#             count += 1
+#             print(f"Your current letters are: {user_list}\n"
+#                   f"{9 - count} letters remaining.")
+#         elif user_choice == "v":
+#             chosen_vowel = random.choice(VOWEL_LIST)
+#             user_list.append(chosen_vowel)
+#             count += 1
+#             print(f"Your current letters are: {user_list}\n"
+#                   f"{9 - count} letters remaining.")
+#         else:
+#             "Incorrect input, please enter again"
+#
+# user_list =[]
+# user_choice()
+# print(user_list)
 
 
-# When looking at user_dict[i], obvious word raze was not found. something is wrong with the combination
-# answer, had it set as combination instead of permutation
+# TODO: Create a dataset for the different v:c combinations and determine the mean score for each combination
 
-# Extra things I want to do on the project:
-# Determine the optimal amount of vowels and consonants to choose to achieve average highest score
+
+word_bank = CreateGameDict().generate_game_dict()
+
+user_list = random.choices(VOWEL_LIST, k=4) + random.choices(CONSONANT_LIST, k=5)
+print(user_list)
+
+count = 0
+score_list = []
+start_time = time.time()
+
+while count < 100:
+    user_list = random.choices(VOWEL_LIST, k=4) + random.choices(CONSONANT_LIST, k=5)
+    RepeatTest = ScoreGenerator(user_list=user_list, word_dict=word_bank)
+    score_list.append(RepeatTest.score)
+    count += 1
+
+end_time = time.time()
+time_taken = end_time - start_time
+
+print(score_list)
+print(f"It took {time_taken} seconds to complete {count} runs of the game")
+
+# TODO: Need to account for None return (set to zero)
+# TODO: Automate ratios (adjust the choices values)
+# TODO: Export the data to a data text file where columns are ratio, and list. rows are list of each ratio
+# TODO: Run stats on each dataset
+# TODO: Make a Nominal Distribution Curve for each ratio.
+
+# What would happen if choices was changed to sample? does this change ratios if each letter in list is unique
+
