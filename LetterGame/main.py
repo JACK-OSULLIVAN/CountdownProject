@@ -1,4 +1,4 @@
-from letter_game_classses import CreateGameDict, ScoreGenerator
+from letter_game_class_list import CreateGameDict, ScoreGenerator
 import random
 import time
 
